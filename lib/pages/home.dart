@@ -11,7 +11,6 @@ class PlaylistScreen extends StatefulWidget {
 }
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
-  final playlistUrlController = TextEditingController();
   late Stream<Map<String, dynamic>> playlistDataStream;
   late String playlistTitle = "";
 
@@ -19,12 +18,11 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   void initState() {
     super.initState();
     playlistDataStream = createPlaylistDataStream(
-        'https://www.youtube.com/playlist?list=PLqAfPOrmacr963ATEroh67fbvjmTzTEx5');
+        'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
   }
 
   @override
   void dispose() {
-    playlistUrlController.dispose();
     super.dispose();
   }
 
@@ -69,9 +67,19 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           if (snapshot.hasData) {
             final playlistData = snapshot.data!;
             if (playlistData.containsKey('items')) {
-              return ListWidget(
-                playlistTitle: playlistTitle,
-                playlistData: playlistData,
+              return SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Image.network(
+                      playlistData['items'][0]['snippet']['thumbnails']['high']
+                          ['url'],
+                    ),
+                    ListWidget(
+                      playlistTitle: playlistTitle,
+                      playlistData: playlistData,
+                    )
+                  ],
+                ),
               );
             } else {
               return const Center(
