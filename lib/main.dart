@@ -7,9 +7,12 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      title: 'YouTube Playlist Stream',
-      home: PlaylistScreen(),
+    return MaterialApp(
+      title: 'YouTube Playlist',
+      theme: ThemeData(
+          scaffoldBackgroundColor: const Color.fromARGB(255, 26, 26, 26),
+          textTheme: Typography.whiteRedmond),
+      home: const PlaylistScreen(),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/widgets/list_info.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
@@ -59,7 +60,19 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YouTube Playlist Stream'),
+        title: const Text('YouTube Playlist'),
+        backgroundColor: const Color.fromARGB(255, 37, 37, 37),
+        actions: const [
+          Icon(Icons.screen_share_outlined),
+          SizedBox(
+            width: 10,
+          ),
+          Icon(Icons.search),
+          SizedBox(
+            width: 5,
+          ),
+          Icon(Icons.more_vert),
+        ],
       ),
       body: StreamBuilder<Map<String, dynamic>>(
         stream: playlistDataStream,
@@ -68,22 +81,25 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
             final playlistData = snapshot.data!;
             if (playlistData.containsKey('items')) {
               return SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
-                    Image.network(
-                      playlistData['items'][0]['snippet']['thumbnails']['high']
-                          ['url'],
+                    ListInfo(
+                      data: playlistData['items'].length,
+                      imgUrl: playlistData['items'][0]['snippet']['thumbnails']
+                          ['high']['url'],
                     ),
                     ListWidget(
                       playlistTitle: playlistTitle,
                       playlistData: playlistData,
-                    )
+                    ),
                   ],
                 ),
               );
             } else {
               return const Center(
-                  child: Text('Playlist data is not available.'));
+                child: Text('Playlist data is not available.'),
+              );
             }
           } else {
             return Container();

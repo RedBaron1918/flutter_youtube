@@ -11,13 +11,23 @@ class VideoDetailsScreen extends StatefulWidget {
   State<VideoDetailsScreen> createState() => _VideoDetailsScreenState();
 }
 
-class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
+class _VideoDetailsScreenState extends State<VideoDetailsScreen>
+    with TickerProviderStateMixin {
   late YoutubePlayerController _controller;
   late bool isReady;
+  bool _isExpanded = false;
+  String _descriptionShort = "";
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
+    String description = widget.videoData['snippet']['description'];
+    _descriptionShort = description.length >= 100
+        ? "${description.substring(0, 100)}..."
+        : description;
+
     isReady = false;
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoData['snippet']['resourceId']['videoId'],
@@ -26,12 +36,30 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
         mute: false,
       ),
     );
+    _animationController =
+        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _animationController.dispose();
     super.dispose();
+  }
+
+  void _toggleExpand() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
   }
 
   @override
@@ -39,7 +67,10 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
     final video = widget.videoData['snippet'];
     return Scaffold(
       appBar: AppBar(
-        title: Text(video['title']),
+        backgroundColor: const Color.fromARGB(255, 37, 37, 37),
+        title: Text(
+          video['title'],
+        ),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -60,9 +91,26 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen> {
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
                   const SizedBox(height: 8.0),
-                  Text(
-                    video['description'],
-                    style: Theme.of(context).textTheme.bodyMedium,
+                  GestureDetector(
+                    onTap: _toggleExpand,
+                    child: Container(
+                      height: _isExpanded ? null : 100.0,
+                      child: Text(
+                        _isExpanded ? video['description'] : _descriptionShort,
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Visibility(
+                    visible: _isExpanded,
+                    child: FadeTransition(
+                      opacity: _animation,
+                      child: Text(
+                        video['description'],
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                    ),
                   ),
                 ],
               ),

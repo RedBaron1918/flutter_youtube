@@ -15,7 +15,7 @@ class ListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       itemCount: playlistData['items'].length,
       itemBuilder: (context, index) {
         final video = playlistData['items'][index]['snippet'];
@@ -23,8 +23,13 @@ class ListWidget extends StatelessWidget {
           width: 100,
           height: 100,
           child: ListTile(
-            title: Text(video['title']),
-            leading: Image.network(video['thumbnails']['default']['url']),
+            title: Text(
+              video['title'],
+            ),
+            subtitle: Text(video['videoOwnerChannelTitle']),
+            leading: Image.network(
+              video['thumbnails']['default']['url'],
+            ),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
