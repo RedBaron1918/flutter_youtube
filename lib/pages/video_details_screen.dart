@@ -115,6 +115,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 ],
               ),
             ),
+            Text("list hereee")
           ],
         ),
       ),

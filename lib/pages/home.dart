@@ -90,7 +90,6 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
                           ['high']['url'],
                     ),
                     ListWidget(
-                      playlistTitle: playlistTitle,
                       playlistData: playlistData,
                     ),
                   ],

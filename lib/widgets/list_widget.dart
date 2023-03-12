@@ -4,11 +4,9 @@ import 'package:fluttertask2/pages/video_details_screen.dart';
 class ListWidget extends StatelessWidget {
   const ListWidget({
     super.key,
-    required this.playlistTitle,
     required this.playlistData,
   });
 
-  final String playlistTitle;
   final Map<String, dynamic> playlistData;
 
   @override
