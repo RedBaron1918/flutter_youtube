@@ -32,7 +32,8 @@ class ListWidget extends StatelessWidget {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => VideoDetailsScreen(
-                      videoData: playlistData['items'][index]),
+                    videoData: playlistData['items'][index],
+                  ),
                 ),
               );
             },

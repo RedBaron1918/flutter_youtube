@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertask2/widgets/list_info.dart';
-import 'package:http/http.dart' as http;
 import 'dart:async';
-import 'dart:convert';
 import '../widgets/list_widget.dart';
+import 'package:fluttertask2/utils/fetch.dart';
 
 class PlaylistScreen extends StatefulWidget {
   const PlaylistScreen({super.key});
@@ -25,19 +24,6 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Future<Map<String, dynamic>> fetchPlaylistData(String playlistUrl) async {
-    const apiKey = 'AIzaSyDF24QdFRwrMg0OXJT3fBObRuOD9h2WOwU';
-    final playlistId = playlistUrl.split('?list=')[1];
-    final apiUrl = 'https://www.googleapis.com/youtube/v3/playlistItems?'
-        'part=snippet&maxResults=50&playlistId=$playlistId&key=$apiKey';
-    final response = await http.get(Uri.parse(apiUrl));
-    if (response.statusCode == 200) {
-      return jsonDecode(response.body);
-    } else {
-      throw Exception('Failed to fetch playlist data');
-    }
   }
 
   Stream<Map<String, dynamic>> createPlaylistDataStream(
@@ -62,16 +48,28 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
       appBar: AppBar(
         title: const Text('YouTube Playlist'),
         backgroundColor: const Color.fromARGB(255, 37, 37, 37),
-        actions: const [
-          Icon(Icons.screen_share_outlined),
-          SizedBox(
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.screen_share_outlined),
+            splashRadius: 20,
+            onPressed: () {},
+          ),
+          const SizedBox(
             width: 10,
           ),
-          Icon(Icons.search),
-          SizedBox(
+          IconButton(
+            icon: const Icon(Icons.search),
+            splashRadius: 20,
+            onPressed: () {},
+          ),
+          const SizedBox(
             width: 5,
           ),
-          Icon(Icons.more_vert),
+          IconButton(
+            icon: const Icon(Icons.more_vert),
+            splashRadius: 20,
+            onPressed: () {},
+          ),
         ],
       ),
       body: StreamBuilder<Map<String, dynamic>>(

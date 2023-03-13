@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/widgets/list_big.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
+import 'package:fluttertask2/utils/fetch.dart';
 
 class VideoDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> videoData;
@@ -15,10 +17,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     with TickerProviderStateMixin {
   late YoutubePlayerController _controller;
   late bool isReady;
+  late Stream<Map<String, dynamic>> playlistDataStream;
   bool _isExpanded = false;
   String _descriptionShort = "";
   late AnimationController _animationController;
   late Animation<double> _animation;
+  late String playlistTitle = "";
 
   @override
   void initState() {
@@ -29,6 +33,8 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
         : description;
 
     isReady = false;
+    playlistDataStream = createPlaylistDataStream(
+        'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoData['snippet']['resourceId']['videoId'],
       flags: const YoutubePlayerFlags(
@@ -36,8 +42,10 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
         mute: false,
       ),
     );
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     _animation = CurvedAnimation(
       parent: _animationController,
       curve: Curves.easeInOut,
@@ -51,6 +59,22 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     super.dispose();
   }
 
+  Stream<Map<String, dynamic>> createPlaylistDataStream(
+      String playlistUrl) async* {
+    while (true) {
+      try {
+        final playlistData = await fetchPlaylistData(playlistUrl);
+        playlistTitle = playlistData['items'][0]['snippet']['channelTitle'];
+        yield playlistData;
+      } catch (e) {
+        yield {};
+      }
+      await Future.delayed(
+        const Duration(minutes: 2),
+      );
+    }
+  }
+
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -60,6 +84,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
         _animationController.reverse();
       }
     });
+  }
+
+  void changeVideo(String videoId) {
+    // setState(() {
+    _controller.load(videoId);
+    // });
   }
 
   @override
@@ -88,13 +118,13 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 children: [
                   Text(
                     video['title'],
-                    style: Theme.of(context).textTheme.bodyLarge,
+                    style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8.0),
                   GestureDetector(
                     onTap: _toggleExpand,
-                    child: Container(
-                      height: _isExpanded ? null : 100.0,
+                    child: SizedBox(
+                      height: _isExpanded ? null : 40.0,
                       child: Text(
                         _isExpanded ? video['description'] : _descriptionShort,
                         style: Theme.of(context).textTheme.bodyMedium,
@@ -112,10 +142,73 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                       ),
                     ),
                   ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.thumb_up_alt_outlined),
+                            label: const Text(""),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 39, 39, 39),
+                            ),
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            label: const Text(""),
+                            icon: const Icon(Icons.thumb_down_alt_outlined),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 39, 39, 39),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () {},
+                        icon: const Icon(Icons.shortcut_sharp),
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black),
+                        label: const Text("share"),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
-            Text("list hereee")
+            StreamBuilder<Map<String, dynamic>>(
+              stream: playlistDataStream,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  final playlistData = snapshot.data!;
+                  if (playlistData.containsKey('items')) {
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        children: [
+                          ListBig(
+                            playlistData: playlistData,
+                            changeVideo: changeVideo,
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    return const Center(
+                      child: Text('Playlist data is not available.'),
+                    );
+                  }
+                } else {
+                  return Container();
+                }
+              },
+            ),
           ],
         ),
       ),
