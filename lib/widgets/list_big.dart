@@ -5,11 +5,9 @@ class ListBig extends StatefulWidget {
   const ListBig({
     super.key,
     required this.playlistData,
-    required this.changeVideo,
   });
 
   final Map<String, dynamic> playlistData;
-  final Function changeVideo;
 
   @override
   State<ListBig> createState() => _ListBigState();
@@ -26,15 +24,15 @@ class _ListBigState extends State<ListBig> {
         final video = widget.playlistData['items'][index]['snippet'];
         return InkWell(
           onTap: () {
-            widget.changeVideo(widget.playlistData['items'][index]['snippet']
-                ['resourceId']['videoId']);
-            // Navigator.of(context).pushReplacement(
-            //   MaterialPageRoute(
-            //     builder: (context) => VideoDetailsScreen(
-            //       videoData: widget.playlistData['items'][index],
-            //     ),
-            //   ),
-            // );
+            // widget.changeVideo(widget.playlistData['items'][index]['snippet']
+            //     ['resourceId']['videoId']);
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => VideoDetailsScreen(
+                  videoData: widget.playlistData['items'][index],
+                ),
+              ),
+            );
           },
           child: Padding(
             padding: const EdgeInsets.all(10.0),

@@ -86,12 +86,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     });
   }
 
-  void changeVideo(String videoId) {
-    // setState(() {
-    _controller.load(videoId);
-    // });
-  }
-
   @override
   Widget build(BuildContext context) {
     final video = widget.videoData['snippet'];
@@ -194,7 +188,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                         children: [
                           ListBig(
                             playlistData: playlistData,
-                            changeVideo: changeVideo,
                           ),
                         ],
                       ),
