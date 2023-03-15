@@ -8,7 +8,6 @@ Future<Map<String, dynamic>> fetchPlaylistData(String playlistUrl) async {
   final apiUrl = 'https://www.googleapis.com/youtube/v3/playlistItems?'
       'part=snippet&maxResults=50&playlistId=$playlistId&key=$apiKey';
   final response = await http.get(Uri.parse(apiUrl));
-  print(apiUrl);
   if (response.statusCode == 200) {
     return jsonDecode(response.body);
   } else {
