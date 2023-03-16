@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertask2/utils/services.dart';
 import 'package:fluttertask2/widgets/list_info.dart';
 import 'dart:async';
+import '../module/module.dart';
 import '../widgets/list_widget.dart';
 
 class PlaylistScreen extends StatefulWidget {
@@ -11,7 +12,7 @@ class PlaylistScreen extends StatefulWidget {
 }
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
-  late Stream<Map<String, dynamic>> playlistDataStream;
+  late Stream<VideosList> playlistDataStream;
   late String playlistTitle = "";
 
   @override
@@ -26,18 +27,22 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
     super.dispose();
   }
 
-  Stream<Map<String, dynamic>> createPlaylistDataStream(
-      String playlistUrl) async* {
+  Stream<VideosList> createPlaylistDataStream(String playlistUrl) async* {
     while (true) {
       try {
         final playlistData = await Services.fetchPlaylistData(playlistUrl);
+        playlistTitle = playlistData.videos![0].video!.channelTitle!;
         yield playlistData;
       } catch (e) {
-        yield {};
+        yield VideosList(
+          kind: '',
+          etag: '',
+          nextPageToken: null,
+          videos: [],
+          pageInfo: PageInfo(totalResults: 0, resultsPerPage: 0),
+        );
       }
-      await Future.delayed(
-        const Duration(minutes: 2),
-      );
+      await Future.delayed(const Duration(minutes: 2));
     }
   }
 
@@ -71,20 +76,21 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<Map<String, dynamic>>(
+      body: StreamBuilder<VideosList>(
         stream: playlistDataStream,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             final playlistData = snapshot.data!;
-            if (playlistData.containsKey('items')) {
+            if (playlistData.videos != null) {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: Column(
                   children: [
                     ListInfo(
-                      data: playlistData['items'].length,
-                      imgUrl: playlistData['items'][0]['snippet']['thumbnails']
-                          ['high']['url'],
+                      data: playlistData.videos!.length,
+                      imgUrl: playlistData
+                              .videos?[0].video?.thumbnails?.high?.url ??
+                          '',
                     ),
                     ListWidget(
                       playlistData: playlistData,

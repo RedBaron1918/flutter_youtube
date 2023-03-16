@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:fluttertask2/widgets/list_big.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../module/module.dart';
 import '../utils/services.dart';
 
 class VideoDetailsScreen extends StatefulWidget {
-  final Map<String, dynamic> videoData;
+  final VideoItem videoData;
 
   const VideoDetailsScreen({Key? key, required this.videoData})
       : super(key: key);
@@ -18,7 +19,8 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     with TickerProviderStateMixin {
   late YoutubePlayerController _controller;
   late bool isReady;
-  late Stream<Map<String, dynamic>> playlistDataStream;
+  late Stream<VideosList> playlistDataStream;
+
   bool _isExpanded = false;
   String _descriptionShort = "";
   late AnimationController _animationController;
@@ -28,7 +30,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   @override
   void initState() {
     super.initState();
-    String description = widget.videoData['snippet']['description'];
+    String description = widget.videoData.video?.description ?? '';
     _descriptionShort = description.length >= 100
         ? "${description.substring(0, 100)}..."
         : description;
@@ -37,7 +39,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     playlistDataStream = createPlaylistDataStream(
         'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
     _controller = YoutubePlayerController(
-      initialVideoId: widget.videoData['snippet']['resourceId']['videoId'],
+      initialVideoId: widget.videoData.video?.resourceId?.videoId ?? '',
       flags: const YoutubePlayerFlags(
         autoPlay: true,
         mute: false,
@@ -60,19 +62,22 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     super.dispose();
   }
 
-  Stream<Map<String, dynamic>> createPlaylistDataStream(
-      String playlistUrl) async* {
+  Stream<VideosList> createPlaylistDataStream(String playlistUrl) async* {
     while (true) {
       try {
         final playlistData = await Services.fetchPlaylistData(playlistUrl);
-        playlistTitle = playlistData['items'][0]['snippet']['channelTitle'];
+        playlistTitle = playlistData.videos![0].video!.channelTitle!;
         yield playlistData;
       } catch (e) {
-        yield {};
+        yield VideosList(
+          kind: '',
+          etag: '',
+          nextPageToken: null,
+          videos: [],
+          pageInfo: PageInfo(totalResults: 0, resultsPerPage: 0),
+        );
       }
-      await Future.delayed(
-        const Duration(minutes: 2),
-      );
+      await Future.delayed(const Duration(minutes: 2));
     }
   }
 
@@ -93,12 +98,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
 
   @override
   Widget build(BuildContext context) {
-    final video = widget.videoData['snippet'];
+    final video = widget.videoData.video;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 37, 37, 37),
         title: Text(
-          video['title'],
+          video?.title ?? '',
         ),
       ),
       body: SingleChildScrollView(
@@ -116,7 +121,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    video['title'],
+                    video?.title ?? '',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8.0),
@@ -125,7 +130,9 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                     child: SizedBox(
                       height: _isExpanded ? null : 40.0,
                       child: Text(
-                        _isExpanded ? video['description'] : _descriptionShort,
+                        _isExpanded
+                            ? video?.description ?? ''
+                            : _descriptionShort,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -136,7 +143,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                     child: FadeTransition(
                       opacity: _animation,
                       child: Text(
-                        video['description'],
+                        video?.description ?? '',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ),
@@ -181,12 +188,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 ],
               ),
             ),
-            StreamBuilder<Map<String, dynamic>>(
+            StreamBuilder<VideosList>(
               stream: playlistDataStream,
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final playlistData = snapshot.data!;
-                  if (playlistData.containsKey('items')) {
+                  if (playlistData.videos != null) {
                     return SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: Column(

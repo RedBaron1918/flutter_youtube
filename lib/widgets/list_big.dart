@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/module/module.dart';
 
 import '../pages/video_details_screen.dart';
 
@@ -9,7 +10,7 @@ class ListBig extends StatefulWidget {
     // required this.changeVideo,
   });
 
-  final Map<String, dynamic> playlistData;
+  final VideosList playlistData;
   //final Function changeVideo;
   @override
   State<ListBig> createState() => _ListBigState();
@@ -21,9 +22,9 @@ class _ListBigState extends State<ListBig> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: widget.playlistData['items'].length,
+      itemCount: widget.playlistData.videos?.length,
       itemBuilder: (context, index) {
-        final video = widget.playlistData['items'][index]['snippet'];
+        final video = widget.playlistData.videos![index].video;
         return InkWell(
           onTap: () {
             // widget.changeVideo(widget.playlistData['items'][index]['snippet']
@@ -31,7 +32,7 @@ class _ListBigState extends State<ListBig> {
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (context) => VideoDetailsScreen(
-                  videoData: widget.playlistData['items'][index],
+                  videoData: widget.playlistData.videos![index],
                 ),
               ),
             );
@@ -48,12 +49,12 @@ class _ListBigState extends State<ListBig> {
                     SizedBox(
                       width: double.infinity,
                       child: Image.network(
-                        video['thumbnails']['high']['url'],
+                        video?.thumbnails?.high?.url ?? '',
                       ),
                     ),
-                    Text(video['title']),
+                    Text(video?.title ?? ''),
                     Text(
-                      video['videoOwnerChannelTitle'],
+                      video?.channelTitle ?? '',
                     )
                   ],
                 ),

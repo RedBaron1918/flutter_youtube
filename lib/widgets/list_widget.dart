@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/module/module.dart';
 import 'package:fluttertask2/pages/video_details_screen.dart';
 
 class ListWidget extends StatelessWidget {
@@ -7,32 +8,32 @@ class ListWidget extends StatelessWidget {
     required this.playlistData,
   });
 
-  final Map<String, dynamic> playlistData;
+  final VideosList playlistData;
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: playlistData['items'].length,
+      itemCount: playlistData.videos?.length,
       itemBuilder: (context, index) {
-        final video = playlistData['items'][index]['snippet'];
+        final video = playlistData.videos?[index].video;
         return SizedBox(
           width: 100,
           height: 100,
           child: ListTile(
             title: Text(
-              video['title'],
+              video?.title ?? '',
             ),
-            subtitle: Text(video['videoOwnerChannelTitle']),
+            subtitle: Text(video?.channelTitle ?? ''),
             leading: Image.network(
-              video['thumbnails']['default']['url'],
+              video?.thumbnails?.thumbnailsDefault?.url ?? '',
             ),
             onTap: () {
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: (context) => VideoDetailsScreen(
-                    videoData: playlistData['items'][index],
+                    videoData: playlistData.videos![index],
                   ),
                 ),
               );
