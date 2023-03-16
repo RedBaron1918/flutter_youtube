@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../pages/video_details_screen.dart';
+
 class ListBig extends StatefulWidget {
   const ListBig({
     super.key,
