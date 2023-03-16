@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertask2/widgets/list_big.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-
 import '../module/module.dart';
 import '../utils/services.dart';
 
@@ -26,10 +25,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   late AnimationController _animationController;
   late Animation<double> _animation;
   late String playlistTitle = "";
+  late bool caption;
 
   @override
   void initState() {
     super.initState();
+    caption = false;
     String description = widget.videoData.video?.description ?? '';
     _descriptionShort = description.length >= 100
         ? "${description.substring(0, 100)}..."
@@ -42,6 +43,8 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
       initialVideoId: widget.videoData.video?.resourceId?.videoId ?? '',
       flags: const YoutubePlayerFlags(
         autoPlay: true,
+        enableCaption: false,
+        loop: true,
         mute: false,
       ),
     );
@@ -95,6 +98,9 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   // void changeVideo(String videoId) {
   // _controller.load(videoId);
   //}
+  void changeCaption(bool switching) {
+    _controller.flags.copyWith(enableCaption: switching);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +120,49 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
               controller: _controller,
               showVideoProgressIndicator: true,
               onReady: () => isReady = true,
+              progressColors: const ProgressBarColors(
+                backgroundColor: Colors.grey,
+                playedColor: Colors.red,
+                handleColor: Colors.white,
+              ),
+              liveUIColor: Colors.black,
+              topActions: [
+                Expanded(
+                  child: Text(
+                    video?.title ?? '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                ),
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.closed_caption_off,
+                        color: caption ? Colors.white : Colors.grey,
+                        size: 25.0,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          caption = !caption;
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.settings,
+                        color: Colors.white,
+                        size: 25.0,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ],
+                )
+              ],
             ),
             Padding(
               padding: const EdgeInsets.all(16.0),
