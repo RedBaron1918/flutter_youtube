@@ -1,33 +1,28 @@
-import 'dart:io';
-
-import 'package:fluttertask2/consts.dart';
+import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
-import '../module/module.dart';
+final Map<String, dynamic> _cachedResponses = {};
 
 class Services {
-  static const CHANNEL_ID = 'PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47';
-  static const _baseUrl = 'www.googleapis.com';
+  static Future<Map<String, dynamic>> fetchPlaylistData(
+      String playlistUrl) async {
+    if (_cachedResponses.containsKey(playlistUrl)) {
+      print(playlistUrl);
+      return Future.value(_cachedResponses[playlistUrl]);
+    }
 
-  static Future<VideosList> getVideosList() async {
-    Map<String, String> parameters = {
-      'part': 'snippet',
-      'playlistId': CHANNEL_ID,
-      'maxResults': '8',
-      'key': Constants.API_KEY,
-    };
-    Map<String, String> headers = {
-      HttpHeaders.contentTypeHeader: 'application/json',
-    };
-    Uri uri = Uri.https(
-      _baseUrl,
-      '/youtube/v3/playlistItems',
-      parameters,
-    );
-    Response response = await http.get(uri, headers: headers);
-    // print(response.body);
-    VideosList videosList = videosListFromJson(response.body);
-    return videosList;
+    const apiKey = 'AIzaSyDF24QdFRwrMg0OXJT3fBObRuOD9h2WOwU';
+    final playlistId = playlistUrl.split('?list=')[1];
+    final apiUrl = 'https://www.googleapis.com/youtube/v3/playlistItems?'
+        'part=snippet&maxResults=50&playlistId=$playlistId&key=$apiKey';
+    final response = await http.get(Uri.parse(apiUrl));
+    if (response.statusCode == 200) {
+      print("asfihauisfhiasudhiusdhuhsdifhsidfhsidfhisudhfisdhfishdufisdfsdf");
+      final decodedResponse = jsonDecode(response.body);
+      _cachedResponses[playlistUrl] = decodedResponse;
+      return decodedResponse;
+    } else {
+      throw Exception('Failed to fetch playlist data');
+    }
   }
 }

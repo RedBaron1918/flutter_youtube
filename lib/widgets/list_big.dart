@@ -6,10 +6,11 @@ class ListBig extends StatefulWidget {
   const ListBig({
     super.key,
     required this.playlistData,
+    // required this.changeVideo,
   });
 
   final Map<String, dynamic> playlistData;
-
+  //final Function changeVideo;
   @override
   State<ListBig> createState() => _ListBigState();
 }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertask2/widgets/list_big.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:fluttertask2/utils/fetch.dart';
+
+import '../utils/services.dart';
 
 class VideoDetailsScreen extends StatefulWidget {
   final Map<String, dynamic> videoData;
@@ -63,7 +64,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
       String playlistUrl) async* {
     while (true) {
       try {
-        final playlistData = await fetchPlaylistData(playlistUrl);
+        final playlistData = await Services.fetchPlaylistData(playlistUrl);
         playlistTitle = playlistData['items'][0]['snippet']['channelTitle'];
         yield playlistData;
       } catch (e) {
@@ -85,6 +86,10 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
       }
     });
   }
+
+  // void changeVideo(String videoId) {
+  // _controller.load(videoId);
+  //}
 
   @override
   Widget build(BuildContext context) {

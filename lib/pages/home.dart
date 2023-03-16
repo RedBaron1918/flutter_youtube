@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/utils/services.dart';
 import 'package:fluttertask2/widgets/list_info.dart';
 import 'dart:async';
 import '../widgets/list_widget.dart';
-import 'package:fluttertask2/utils/fetch.dart';
 
 class PlaylistScreen extends StatefulWidget {
   const PlaylistScreen({super.key});
@@ -30,8 +30,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
       String playlistUrl) async* {
     while (true) {
       try {
-        final playlistData = await fetchPlaylistData(playlistUrl);
-        playlistTitle = playlistData['items'][0]['snippet']['channelTitle'];
+        final playlistData = await Services.fetchPlaylistData(playlistUrl);
         yield playlistData;
       } catch (e) {
         yield {};
