@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertask2/widgets/list_big.dart';
+import 'package:fluttertask2/widgets/play_list_stream.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import '../module/module.dart';
 import '../utils/services.dart';
@@ -19,7 +20,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   late YoutubePlayerController _controller;
   late bool isReady;
   late Stream<VideosList> playlistDataStream;
-
   bool _isExpanded = false;
   String _descriptionShort = "";
   late AnimationController _animationController;
@@ -40,7 +40,7 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
         : description;
 
     isReady = false;
-    playlistDataStream = createPlaylistDataStream(
+    playlistDataStream = Services.createPlaylistDataStream(
         'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoData.video?.resourceId?.videoId ?? '',
@@ -74,25 +74,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     super.dispose();
   }
 
-  Stream<VideosList> createPlaylistDataStream(String playlistUrl) async* {
-    while (true) {
-      try {
-        final playlistData = await Services.fetchPlaylistData(playlistUrl);
-        playlistTitle = playlistData.videos![0].video!.channelTitle!;
-        yield playlistData;
-      } catch (e) {
-        yield VideosList(
-          kind: '',
-          etag: '',
-          nextPageToken: null,
-          videos: [],
-          pageInfo: PageInfo(totalResults: 0, resultsPerPage: 0),
-        );
-      }
-      await Future.delayed(const Duration(minutes: 2));
-    }
-  }
-
   void _toggleExpand() {
     setState(() {
       _isExpanded = !_isExpanded;
@@ -104,9 +85,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     });
   }
 
-  // void changeVideo(String videoId) {
-  // _controller.load(videoId);
-  //}
   void changeCaption(bool switching) {
     _controller.flags.copyWith(enableCaption: switching);
   }
@@ -236,6 +214,9 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                       )
                     ],
                   ),
+                  const SizedBox(
+                    height: 7,
+                  ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -319,29 +300,22 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 ],
               ),
             ),
-            StreamBuilder<VideosList>(
+            PlaylistStreamBuilder(
               stream: playlistDataStream,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  final playlistData = snapshot.data!;
-                  if (playlistData.videos != null) {
-                    return SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Column(
-                        children: [
-                          ListBig(
-                            playlistData: playlistData,
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return const Center(
-                      child: Text('Playlist data is not available.'),
-                    );
-                  }
+              builder: (playlistData) {
+                if (playlistData.videos != null) {
+                  return SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Column(
+                      children: [
+                        ListBig(playlistData: playlistData),
+                      ],
+                    ),
+                  );
                 } else {
-                  return Container();
+                  return const Center(
+                    child: Text('Playlist data is not available.'),
+                  );
                 }
               },
             ),

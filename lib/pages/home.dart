@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertask2/utils/services.dart';
 import 'package:fluttertask2/widgets/list_info.dart';
+import 'package:fluttertask2/widgets/play_list_stream.dart';
 import 'dart:async';
 import '../module/module.dart';
 import '../widgets/list_widget.dart';
@@ -18,32 +19,13 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
   @override
   void initState() {
     super.initState();
-    playlistDataStream = createPlaylistDataStream(
+    playlistDataStream = Services.createPlaylistDataStream(
         'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
   }
 
   @override
   void dispose() {
     super.dispose();
-  }
-
-  Stream<VideosList> createPlaylistDataStream(String playlistUrl) async* {
-    while (true) {
-      try {
-        final playlistData = await Services.fetchPlaylistData(playlistUrl);
-        playlistTitle = playlistData.videos![0].video!.channelTitle!;
-        yield playlistData;
-      } catch (e) {
-        yield VideosList(
-          kind: '',
-          etag: '',
-          nextPageToken: null,
-          videos: [],
-          pageInfo: PageInfo(totalResults: 0, resultsPerPage: 0),
-        );
-      }
-      await Future.delayed(const Duration(minutes: 2));
-    }
   }
 
   @override
@@ -76,35 +58,30 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
           ),
         ],
       ),
-      body: StreamBuilder<VideosList>(
+      body: PlaylistStreamBuilder(
         stream: playlistDataStream,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final playlistData = snapshot.data!;
-            if (playlistData.videos != null) {
-              return SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Column(
-                  children: [
-                    ListInfo(
-                      data: playlistData.videos!.length,
-                      imgUrl: playlistData
-                              .videos?[0].video?.thumbnails?.high?.url ??
-                          '',
-                    ),
-                    ListWidget(
-                      playlistData: playlistData,
-                    ),
-                  ],
-                ),
-              );
-            } else {
-              return const Center(
-                child: Text('Playlist data is not available.'),
-              );
-            }
+        builder: (playlistData) {
+          if (playlistData.videos != null) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                children: [
+                  ListInfo(
+                    data: playlistData.videos!.length,
+                    imgUrl:
+                        playlistData.videos?[0].video?.thumbnails?.high?.url ??
+                            '',
+                  ),
+                  ListWidget(
+                    playlistData: playlistData,
+                  ),
+                ],
+              ),
+            );
           } else {
-            return Container();
+            return const Center(
+              child: Text('Playlist data is not available.'),
+            );
           }
         },
       ),
