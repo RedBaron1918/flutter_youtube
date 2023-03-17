@@ -112,7 +112,6 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                 playedColor: Colors.red,
                 handleColor: Colors.white,
               ),
-              liveUIColor: Colors.black,
               topActions: [
                 Expanded(
                   child: Text(
@@ -296,6 +295,56 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                         ],
                       )
                     ],
+                  ),
+                  InkWell(
+                    onTap: () {},
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Card(
+                        color: const Color.fromARGB(255, 39, 39, 39),
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Comments",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      CircleAvatar(
+                                        backgroundImage: NetworkImage(video
+                                                ?.thumbnails
+                                                ?.thumbnailsDefault
+                                                ?.url ??
+                                            ''),
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      const Text(
+                                          "life changing song very cool!")
+                                    ],
+                                  ),
+                                  const Icon(
+                                    Icons.keyboard_arrow_down_outlined,
+                                    color: Colors.white,
+                                  )
+                                ],
+                              )
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
                   )
                 ],
               ),
