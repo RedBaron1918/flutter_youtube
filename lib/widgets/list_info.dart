@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertask2/module/module.dart';
+
+import '../pages/video_details_screen.dart';
 
 class ListInfo extends StatelessWidget {
   const ListInfo({required this.data, required this.imgUrl, super.key});
   final String imgUrl;
-  final int data;
+  final VideosList data;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class ListInfo extends StatelessWidget {
                   const Text("Kote asatiani"),
                   Row(
                     children: [
-                      Text("$data videos"),
+                      Text("${data.videos?.length} videos"),
                       const SizedBox(
                         width: 10,
                       ),
@@ -70,7 +73,15 @@ class ListInfo extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => VideoDetailsScreen(
+                      videoData: data.videos![0],
+                    ),
+                  ),
+                );
+              },
               icon: const Icon(Icons.play_arrow),
               label: const Text("Play"),
               style: ElevatedButton.styleFrom(

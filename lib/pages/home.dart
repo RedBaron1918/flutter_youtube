@@ -67,7 +67,7 @@ class _PlaylistScreenState extends State<PlaylistScreen> {
               child: Column(
                 children: [
                   ListInfo(
-                    data: playlistData.videos!.length,
+                    data: playlistData,
                     imgUrl:
                         playlistData.videos?[0].video?.thumbnails?.high?.url ??
                             '',
