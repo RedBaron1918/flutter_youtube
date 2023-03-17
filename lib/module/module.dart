@@ -91,11 +91,11 @@ class Video {
 
   factory Video.fromJson(Map<String, dynamic> json) => Video(
         publishedAt: DateTime.parse(json["publishedAt"]),
-        channelId: json["channelId"],
+        channelId: json["videoOwnerChannelId"],
         title: json["title"],
         description: json["description"],
         thumbnails: Thumbnails.fromJson(json["thumbnails"]),
-        channelTitle: json["channelTitle"],
+        channelTitle: json["videoOwnerChannelTitle"],
         playlistId: json["playlistId"],
         position: json["position"],
         resourceId: ResourceId.fromJson(json["resourceId"]),
@@ -103,11 +103,11 @@ class Video {
 
   Map<String, dynamic> toJson() => {
         "publishedAt": publishedAt?.toIso8601String(),
-        "channelId": channelId,
+        "videoOwnerChannelId": channelId,
         "title": title,
         "description": description,
         "thumbnails": thumbnails?.toJson(),
-        "channelTitle": channelTitle,
+        "videoOwnerChannelTitle": channelTitle,
         "playlistId": playlistId,
         "position": position,
         "resourceId": resourceId?.toJson(),

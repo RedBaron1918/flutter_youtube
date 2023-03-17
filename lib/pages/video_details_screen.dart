@@ -26,10 +26,13 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   late Animation<double> _animation;
   late String playlistTitle = "";
   late bool caption;
-
+  late bool _isThumbsUpPressed;
+  late bool _isThumbsDownPressed;
   @override
   void initState() {
     super.initState();
+    _isThumbsUpPressed = false;
+    _isThumbsDownPressed = false;
     caption = false;
     String description = widget.videoData.video?.description ?? '';
     _descriptionShort = description.length >= 100
@@ -56,6 +59,12 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
       parent: _animationController,
       curve: Curves.easeInOut,
     );
+  }
+
+  @override
+  void deactivate() {
+    _controller.pause();
+    super.deactivate();
   }
 
   @override
@@ -205,33 +214,106 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                     children: [
                       Row(
                         children: [
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.thumb_up_alt_outlined),
-                            label: const Text(""),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 39, 39, 39),
-                            ),
+                          CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                video?.thumbnails?.thumbnailsDefault?.url ??
+                                    ''),
                           ),
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            label: const Text(""),
-                            icon: const Icon(Icons.thumb_down_alt_outlined),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 39, 39, 39),
-                            ),
+                          const SizedBox(
+                            width: 10,
                           ),
+                          Text(video?.channelTitle ?? '')
                         ],
                       ),
-                      ElevatedButton.icon(
+                      ElevatedButton(
                         onPressed: () {},
-                        icon: const Icon(Icons.shortcut_sharp),
                         style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black),
-                        label: const Text("share"),
+                          backgroundColor: Colors.white,
+                          shape: const StadiumBorder(),
+                          foregroundColor: Colors.black,
+                        ),
+                        child: const Text('Subscribe'),
+                      )
+                    ],
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: BoxDecoration(
+                          color: const Color.fromARGB(255, 39, 39, 39),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 3),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isThumbsUpPressed = !_isThumbsUpPressed;
+                                    if (_isThumbsUpPressed) {
+                                      _isThumbsDownPressed = false;
+                                    }
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.thumb_up_alt_outlined,
+                                  color: _isThumbsUpPressed
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                              ),
+                              const SizedBox(width: 20),
+                              GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    _isThumbsDownPressed =
+                                        !_isThumbsDownPressed;
+                                    if (_isThumbsDownPressed) {
+                                      _isThumbsUpPressed = false;
+                                    }
+                                  });
+                                },
+                                child: Icon(
+                                  Icons.thumb_down_alt_outlined,
+                                  color: _isThumbsDownPressed
+                                      ? Colors.blue
+                                      : Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
+                      Row(
+                        children: [
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.shortcut_rounded),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 39, 39, 39),
+                              shape: const StadiumBorder(),
+                            ),
+                            label: const Text("share"),
+                          ),
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          ElevatedButton.icon(
+                            onPressed: () {},
+                            icon: const Icon(Icons.add_to_photos_outlined),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromARGB(255, 39, 39, 39),
+                              shape: const StadiumBorder(),
+                            ),
+                            label: const Text("Save"),
+                          ),
+                        ],
+                      )
                     ],
                   )
                 ],
