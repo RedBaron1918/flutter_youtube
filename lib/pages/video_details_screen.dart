@@ -26,22 +26,35 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
   late Animation<double> _animation;
   late String playlistTitle = "";
   late bool caption;
-  late bool _isThumbsUpPressed;
-  late bool _isThumbsDownPressed;
+
   @override
   void initState() {
     super.initState();
-    _isThumbsUpPressed = false;
-    _isThumbsDownPressed = false;
+    _initializeFlags();
+    _initializeDescription();
+    _initializePlaylistDataStream();
+    _initializeYoutubePlayerController();
+    _initializeAnimationController();
+  }
+
+  void _initializeFlags() {
     caption = false;
+    isReady = false;
+  }
+
+  void _initializeDescription() {
     String description = widget.videoData.video?.description ?? '';
     _descriptionShort = description.length >= 100
         ? "${description.substring(0, 100)}..."
         : description;
+  }
 
-    isReady = false;
+  void _initializePlaylistDataStream() {
     playlistDataStream = Services.createPlaylistDataStream(
         'https://www.youtube.com/playlist?list=PLpyiw5uEqZ9tfguPsVZoLCFHP7ybPHx47');
+  }
+
+  void _initializeYoutubePlayerController() {
     _controller = YoutubePlayerController(
       initialVideoId: widget.videoData.video?.resourceId?.videoId ?? '',
       flags: const YoutubePlayerFlags(
@@ -51,6 +64,9 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
         mute: false,
       ),
     );
+  }
+
+  void _initializeAnimationController() {
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
@@ -186,165 +202,13 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
                   const SizedBox(
                     height: 5,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          CircleAvatar(
-                            backgroundImage: NetworkImage(
-                                video?.thumbnails?.thumbnailsDefault?.url ??
-                                    ''),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text(video?.channelTitle ?? '')
-                        ],
-                      ),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                          foregroundColor: Colors.black,
-                        ),
-                        child: const Text('Subscribe'),
-                      )
-                    ],
-                  ),
+                  ChannelProfile(video: video),
                   const SizedBox(
                     height: 7,
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: BoxDecoration(
-                          color: const Color.fromARGB(255, 39, 39, 39),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 3),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isThumbsUpPressed = !_isThumbsUpPressed;
-                                    if (_isThumbsUpPressed) {
-                                      _isThumbsDownPressed = false;
-                                    }
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.thumb_up_alt_outlined,
-                                  color: _isThumbsUpPressed
-                                      ? Colors.blue
-                                      : Colors.grey,
-                                ),
-                              ),
-                              const SizedBox(width: 20),
-                              GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    _isThumbsDownPressed =
-                                        !_isThumbsDownPressed;
-                                    if (_isThumbsDownPressed) {
-                                      _isThumbsUpPressed = false;
-                                    }
-                                  });
-                                },
-                                child: Icon(
-                                  Icons.thumb_down_alt_outlined,
-                                  color: _isThumbsDownPressed
-                                      ? Colors.blue
-                                      : Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      Row(
-                        children: [
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.shortcut_rounded),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 39, 39, 39),
-                              shape: const StadiumBorder(),
-                            ),
-                            label: const Text("share"),
-                          ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          ElevatedButton.icon(
-                            onPressed: () {},
-                            icon: const Icon(Icons.add_to_photos_outlined),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  const Color.fromARGB(255, 39, 39, 39),
-                              shape: const StadiumBorder(),
-                            ),
-                            label: const Text("Save"),
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  InkWell(
-                    onTap: () {},
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Card(
-                        color: const Color.fromARGB(255, 39, 39, 39),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Comments",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                              const SizedBox(
-                                height: 10,
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(video
-                                                ?.thumbnails
-                                                ?.thumbnailsDefault
-                                                ?.url ??
-                                            ''),
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      const Text(
-                                          "life changing song very cool!")
-                                    ],
-                                  ),
-                                  const Icon(
-                                    Icons.keyboard_arrow_down_outlined,
-                                    color: Colors.white,
-                                  )
-                                ],
-                              )
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
+                  const UiContent(),
+                  Comment(
+                    video: video,
                   )
                 ],
               ),
@@ -371,6 +235,187 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
           ],
         ),
       ),
+    );
+  }
+}
+
+class ChannelProfile extends StatelessWidget {
+  const ChannelProfile({
+    super.key,
+    required this.video,
+  });
+
+  final Video? video;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            CircleAvatar(
+              backgroundImage:
+                  NetworkImage(video?.thumbnails?.thumbnailsDefault?.url ?? ''),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Text(video?.channelTitle ?? '')
+          ],
+        ),
+        ElevatedButton(
+          onPressed: () {},
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            shape: const StadiumBorder(),
+            foregroundColor: Colors.black,
+          ),
+          child: const Text('Subscribe'),
+        )
+      ],
+    );
+  }
+}
+
+class Comment extends StatelessWidget {
+  const Comment({this.video, super.key});
+  final Video? video;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: () {},
+      child: SizedBox(
+        width: double.infinity,
+        child: Card(
+          color: const Color.fromARGB(255, 39, 39, 39),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "Comments",
+                  style: TextStyle(fontSize: 15),
+                ),
+                const SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundImage: NetworkImage(
+                              video?.thumbnails?.thumbnailsDefault?.url ?? ''),
+                        ),
+                        const SizedBox(
+                          width: 10,
+                        ),
+                        const Text("life changing song very cool!")
+                      ],
+                    ),
+                    const Icon(
+                      Icons.keyboard_arrow_down_outlined,
+                      color: Colors.white,
+                    )
+                  ],
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class UiContent extends StatefulWidget {
+  const UiContent({super.key});
+  @override
+  State<UiContent> createState() => _UiContentState();
+}
+
+class _UiContentState extends State<UiContent> {
+  bool _isThumbsUpPressed = false;
+  bool _isThumbsDownPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 39, 39, 39),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 3),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isThumbsUpPressed = !_isThumbsUpPressed;
+                      if (_isThumbsUpPressed) {
+                        _isThumbsDownPressed = false;
+                      }
+                    });
+                  },
+                  child: Icon(
+                    Icons.thumb_up_alt_outlined,
+                    color: _isThumbsUpPressed ? Colors.blue : Colors.grey,
+                  ),
+                ),
+                const SizedBox(width: 20),
+                GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _isThumbsDownPressed = !_isThumbsDownPressed;
+                      if (_isThumbsDownPressed) {
+                        _isThumbsUpPressed = false;
+                      }
+                    });
+                  },
+                  child: Icon(
+                    Icons.thumb_down_alt_outlined,
+                    color: _isThumbsDownPressed ? Colors.blue : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        Row(
+          children: [
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.shortcut_rounded),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 39, 39, 39),
+                shape: const StadiumBorder(),
+              ),
+              label: const Text("share"),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            ElevatedButton.icon(
+              onPressed: () {},
+              icon: const Icon(Icons.add_to_photos_outlined),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromARGB(255, 39, 39, 39),
+                shape: const StadiumBorder(),
+              ),
+              label: const Text("Save"),
+            ),
+          ],
+        )
+      ],
     );
   }
 }

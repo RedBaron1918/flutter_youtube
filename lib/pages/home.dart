@@ -14,7 +14,6 @@ class PlaylistScreen extends StatefulWidget {
 
 class _PlaylistScreenState extends State<PlaylistScreen> {
   late Stream<VideosList> playlistDataStream;
-  late String playlistTitle = "";
 
   @override
   void initState() {
