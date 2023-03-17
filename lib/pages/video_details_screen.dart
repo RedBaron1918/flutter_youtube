@@ -85,9 +85,9 @@ class _VideoDetailsScreenState extends State<VideoDetailsScreen>
     });
   }
 
-  void changeCaption(bool switching) {
-    _controller.flags.copyWith(enableCaption: switching);
-  }
+  // void changeVideo(String videoId) {
+  // _controller.load(videoId);
+  //}
 
   @override
   Widget build(BuildContext context) {
